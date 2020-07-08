@@ -195,7 +195,6 @@ function loadedFn() {
                 let px = markList[i].x - pw / 2 + shiftToCentre;
                 let py = markList[i].y + changeRatioManualy - ph + shiftToCentreY;
                 ctx.drawImage(pin, px, py, pw, ph);
-                console.log(pin);
                 
                 let idW = ctx.measureText(markList[i].id).width;
                 ctx.fillText(markList[i].id, markList[i].x - idW / 2 + shiftToCentre, markList[i].y - 0.58 * ph + shiftToCentreY + changeRatioManualy);
