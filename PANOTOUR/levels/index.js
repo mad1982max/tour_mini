@@ -22,9 +22,9 @@ let coverGrey = new Image;
 let cover = new Image;
 let pinRed = new Image;
 let pinGreen = new Image;
-pinRed.src = 'img/redPin_.png';
+pinRed.src = './img/redPin_.png';
 coverGrey.src = coverSrc;
-pinGreen.src = 'img/greenPin.png';
+pinGreen.src = './img/greenPin.png';
 plan.src = floorSrc;
 let pinsToClick = [];
 let markList;
@@ -63,8 +63,8 @@ function defineData4Floor() {
     let paramsString = window.location.search;
     let searchParams = new URLSearchParams(paramsString);
     level = searchParams.get("level");
-    floorSrc = `img/${level}.png`
-    coverSrc = `img/${level}_coverGrey.gif`;
+    floorSrc = `./img/${level}.png`
+    coverSrc = `./img/${level}_coverGrey.gif`;
     set1 = dataPin[level];
     console.log(floorSrc, coverSrc, set1.length);
 }
