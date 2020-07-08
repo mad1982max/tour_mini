@@ -22,9 +22,9 @@ let coverGrey = new Image;
 let cover = new Image;
 let pinRed = new Image;
 let pinGreen = new Image;
-pinRed.src = './img/redPin_.png';
+pinRed.src = './img/redPIN_.png';
 coverGrey.src = coverSrc;
-pinGreen.src = './img/greenPin.png';
+pinGreen.src = './img/greenPIN.png';
 plan.src = floorSrc;
 let pinsToClick = [];
 let markList;
@@ -195,6 +195,8 @@ function loadedFn() {
                 let px = markList[i].x - pw / 2 + shiftToCentre;
                 let py = markList[i].y + changeRatioManualy - ph + shiftToCentreY;
                 ctx.drawImage(pin, px, py, pw, ph);
+                console.log(pin);
+                
                 let idW = ctx.measureText(markList[i].id).width;
                 ctx.fillText(markList[i].id, markList[i].x - idW / 2 + shiftToCentre, markList[i].y - 0.58 * ph + shiftToCentreY + changeRatioManualy);
             }
