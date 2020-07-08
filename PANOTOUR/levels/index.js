@@ -35,6 +35,8 @@ let globalAlpha = 0.8;
 let lastX = canvas.width / 2, lastY = canvas.height / 2;
 let dragStart;
 let scaleFactor = 1.1;
+let scaleFactorPinch = 1.04;
+let oldFingDist;
 
 //set 2 only for testing
 let set2 = [{
@@ -82,10 +84,28 @@ function loadedFn() {
     canvas.addEventListener('DOMMouseScroll', handleScroll, false);
     canvas.addEventListener('mousewheel', handleScroll, false);
     canvas.addEventListener('click', on_click, false);
-    canvas.addEventListener("touchstart", (evt) => {
+    canvas.addEventListener('touchstart', (evt) => {
         evt.preventDefault();
         mousedownFn(evt);
-        var touches = evt.changedTouches;
+        let markList = pinsToClick;
+        let pw = pinScale * pin.width * 0.55 * 0.04;
+        let ph = pinScale * pin.height * 0.03;
+
+        for (let i = 0; i < markList.length; i++) {
+            let px = markList[i].x - pw / 2 + shiftToCentre;
+            let py = markList[i].y - ph + changeRatioManualy + shiftToCentreY;
+
+            if (pt && pt.x >= px && pt.x <= (px + pw) && pt.y >= py && pt.y <= (py + ph)) {
+                pointedPano = markList[i].id;
+                inLink = true;
+                console.log('point', pointedPano);
+                break;
+            } else {
+                pointedPano = null;
+                inLink = false;
+            }
+        }
+        on_click(evt);
         
     }, false);
     canvas.addEventListener("touchend", mouseupFN, false);
@@ -180,6 +200,7 @@ function loadedFn() {
 
         if (setFlagObj.set1 || setFlagObj.set2) {
             canvas.addEventListener('mousemove', makePinsClicable, false);
+            //canvas.addEventListener('touchmove', makePinsClicable, false);
         }
 
         if (flag) {
@@ -250,6 +271,7 @@ function loadedFn() {
         ctx.globalAlpha = 1;
         ctx.drawImage(plan, shiftToCentre, shiftToCentreY);
         canvas.removeEventListener('mousemove', makePinsClicable, false);
+        //canvas.removeEventListener('touchmove', makePinsClicable, false);
         checkSets();
     }    
 
@@ -261,11 +283,44 @@ function loadedFn() {
         dragged = false;
     }
 
+    
+
+    function zoomByPinch(evt) {
+        pointX = Math.abs(evt.touches[0].clientX - evt.touches[1].clientX);
+        pointY = Math.abs(evt.touches[0].clientY - evt.touches[1].clientY);
+        lastY = evt.offsetY || (evt.pageY - canvas.offsetTop) || evt.touches[0].clientY;
+        let newFingDist = (pointX**2 + pointY**2)**0.5;
+
+        if(oldFingDist) {
+            let delta = newFingDist - oldFingDist;
+            let scaleNew;
+            if (Math.abs(delta) > 0.2) {
+                scaleNew = delta > 0 ? scaleFactorPinch: 1/scaleFactorPinch;
+                pt = ctx.transformedPoint(pointX, pointY);
+                ctx.translate(pt.x, pt.y);
+                ctx.scale(scaleNew, scaleNew);
+                ctx.translate(-pt.x, -pt.y);
+                scale *= scaleNew;
+                redraw();
+            }                      
+
+        }
+        //pt = ctx.transformedPoint(pointX, pointY);
+        oldFingDist = newFingDist;
+        console.log('2 fingers');        
+    } 
+
     function mousemoveFn(evt) {
+        if(evt.touches && evt.touches.length === 2) {
+            zoomByPinch(evt);            
+            return;            
+        }
+        oldFingDist = 0;
         lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft) || evt.touches[0].clientX;
         lastY = evt.offsetY || (evt.pageY - canvas.offsetTop) || evt.touches[0].clientY;
-        dragged = true;
         pt = ctx.transformedPoint(lastX, lastY);
+        dragged = true;
+        
         if (dragStart) {
             ctx.translate(pt.x - dragStart.x, pt.y - dragStart.y);
             redraw();
@@ -277,8 +332,11 @@ function loadedFn() {
     }    
 
     function on_click(e) {
+        console.log('click');
+        
         if (inLink) {
-            window.open("../PANOS/mainPointCloud.html?level=" + level + "&name=" + pointedPano, "_self");
+            console.log('click on pin', level, pointedPano);
+            // window.open("../PANOS/mainPointCloud.html?level=" + level + "&name=" + pointedPano, "_self");
         }
     }
     
